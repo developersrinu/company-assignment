@@ -164,7 +164,7 @@ export const getChanges = async (owner, repo) => {
 //     try {
 //       const response = await axios.get(`https://api.github.com/repos/${owner}/${repo}/stats/contributors`, {
 //         headers: {
-//           token: process.env.TOKEN
+//           token: process.env.TOKEN//
 //         }
 //       });
   
