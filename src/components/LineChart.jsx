@@ -1,85 +1,83 @@
-import * as React from 'react';
-import Box from '@mui/joy/Box';
-import { LineChart } from '@mui/x-charts/LineChart';
-import Card from '@mui/joy/Card';
-import CardContent from '@mui/joy/CardContent';
+import React, { useEffect } from 'react';
+import Highcharts from 'highcharts';
+import accessibility from 'highcharts/modules/accessibility'; // Import the accessibility module
 
+accessibility(Highcharts);
 
+const LineChart = ({ commitActivityData }) => {
+  useEffect(() => {
+   
+    if (!commitActivityData) {
+      return; 
+    }
 
-export default function BasicLineChart({time,xAxis}) {
- 
+    // Extract weeks and changes data from commitActivityData
+    const { weeks, changes } = commitActivityData;
 
-    return (
-    
-            <Box
-                sx={{
-                    width: '80%',
-                    position: 'relative',
-                    overflow: { xs: 'auto', sm: 'initial' },
-                    margin: '10px auto'
-                }}
-            >
-                <Box
-                    sx={{
-                        position: 'absolute',
-                        display: 'block',
-                        width: '1px',
-                        left: '500px',
-                        top: '-24px',
-                        bottom: '-24px',
-                        '&::before': {
-                            top: '4px',
-                            // content: '""',
-                            display: 'block',
-                            position: 'absolute',
-                            right: '0.5rem',
-                            color: '',
-                            fontSize: 'sm',
-                            fontWeight: 'lg',
-                        },
-                        '&::after': {
-                            top: '4px',
-                            // content: '""',
-                            display: 'block',
-                            position: 'absolute',
-                            left: '0.5rem',
-                            color: '',
-                            fontSize: 'sm',
-                            fontWeight: 'lg',
-                        },
-                    }}
-                />
-                <Card
-                    orientation="horizontal"
-                    sx={{
-                        width: '100%',
-                        flexWrap: 'wrap',
-                        [`& > *`]: {
-                            '--stack-point': '500px',
-                            minWidth:
-                                'clamp(0px, (calc(var(--stack-point) - 2 * var(--Card-padding) - 2 * var(--variant-borderWidth, 0px)) + 1px - 100%) * 999, 100%)',
-                        },
-                        // make the card resizable for demo
-                        overflow: 'auto',
-                        resize: 'horizontal',
-                    }}
-                >
-                    <CardContent>
-                        <LineChart
-                            xAxis={[{ data:xAxis }]}
-                            series={[
-                                {
-                                    data:time,
-                                },
-                            ]}
-                            
-                            width={1000}
-                            height={600}
-                        />
-                    </CardContent>
-                </Card>
-            </Box>
-        );
-}
+    // Ensure the container is available before rendering the chart
+    if (weeks && changes) {
+      Highcharts.chart('container', {
+        title: {
+          text: 'Commit Activity Over Time',
+          align: 'left'
+        },
+        subtitle: {
+          text: 'Number of Commits Over Time',
+          align: 'left'
+        },
+        yAxis: {
+          title: {
+            text: 'Number of Commits'
+          }
+        },
+        xAxis: {
+          categories: weeks,
+          accessibility: {
+            rangeDescription: 'Range: Weekly data'
+          },
+          title: {
+            text: 'Weeks'
+          }
+        },
+        legend: {
+          layout: 'vertical',
+          align: 'right',
+          verticalAlign: 'middle'
+        },
+        plotOptions: {
+          series: {
+            label: {
+              connectorAllowed: false
+            },
+            pointStart: 1 // Assuming week numbers start from 1
+          }
+        },
+        series: [{
+          name: 'Commits',
+          data: changes
+        }],
+        responsive: {
+          rules: [{
+            condition: {
+              maxWidth: 500
+            },
+            chartOptions: {
+              legend: {
+                layout: 'horizontal',
+                align: 'center',
+                verticalAlign: 'bottom'
+              }
+            }
+          }]
+        }
+      });
+    }
+  }, [commitActivityData]); // Update chart when commitActivityData changes
+
+  return <div id="container" />;
+};
+
+export default LineChart;
+
 
 
